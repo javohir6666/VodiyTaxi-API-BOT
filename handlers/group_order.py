@@ -63,6 +63,8 @@ async def send_order_to_group(order_id, order_data):
 
 
 async def handle_driver_accept_order(call: types.CallbackQuery):
+    if not call.data.startswith("accept_"):
+        return  # Noto'g'ri callback bo‘lsa, qaytib ketamiz
     """ Haydovchi buyurtmani qabul qilganda ishlaydi """
     driver_id = call.from_user.id
     get_driver = get_user_info(driver_id)

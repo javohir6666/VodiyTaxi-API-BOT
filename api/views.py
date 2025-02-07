@@ -89,37 +89,17 @@ class UpdateUserRoleDataView(APIView):
 
     def patch(self, request, telegram_id):
         user = get_object_or_404(User, telegram_id=telegram_id)  # Foydalanuvchini topamiz
-        user_role = user.active_role  # User roli
+        new_role = request.data.get("active_role")  # Foydalanuvchi tanlagan yangi rol
 
-        # Foydalanuvchi ma'lumotlarini yangilash
-        user_serializer = UserSerializer(user, data=request.data, partial=True)
-        if user_serializer.is_valid():
-            user_serializer.save()
-        else:
-            return Response(user_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-        # **USER_ROLE ga qarab ma'lumotlarni yangilash**
-        if user_role == "driver":
-            driver = get_object_or_404(Driver, user=user)
-            serializer = DriverSerializer(driver, data=request.data, partial=True)
-
-        elif user_role == "passenger":
-            passenger = get_object_or_404(Passenger, user=user)
-            serializer = PassengerSerializer(passenger, data=request.data, partial=True)
-
-        elif user_role == "shipper":
-            shipper = get_object_or_404(Shipper, user=user)
-            serializer = ShipperSerializer(shipper, data=request.data, partial=True)
-
-        else:
+        if new_role not in dict(User.USER_TYPE_CHOICES):
             return Response({"error": "Noto‘g‘ri user_role!"}, status=status.HTTP_400_BAD_REQUEST)
 
-        # **Agar serializer valid bo‘lsa, saqlaymiz**
-        if serializer.is_valid():
-            serializer.save()
-            return Response({"message": "✅ Ma'lumotlar yangilandi!", "data": serializer.data}, status=status.HTTP_200_OK)
+        try:
+            user.change_role(new_role)  # Foydalanuvchi rolini yangilash
+            return Response({"message": f"✅ Rol o'zgartirildi! Yangi rol: {new_role}"}, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 
@@ -196,9 +176,6 @@ def get_driver_active_orders(request, user_id):
     user = get_object_or_404(User, id=user_id)
 
     orders = Order.objects.filter(driver__isnull=False, driver=user, status="accepted")
-    if not orders.exists():
-        return Response({"message": "Sizda aktiv buyurtmalar yo‘q"}, status=status.HTTP_404_NOT_FOUND)
-
     serializer = OrderSerializer(orders, many=True)
     return Response(serializer.data, status=status.HTTP_200_OK)
 

@@ -12,6 +12,17 @@ def user_role_keyboard():
     )
     return keyboard
 
+def changer_role_keyboard():
+    keyboard = InlineKeyboardMarkup(row_width=2)
+    keyboard.add(
+        InlineKeyboardButton(text="👤 Yo'lovchi", callback_data="changerole_passenger"),
+        InlineKeyboardButton(text="🚖 Haydovchi", callback_data="changerole_driver"),
+        InlineKeyboardButton(text="📦 Yuk beruvchi", callback_data="changerole_shipper")
+    )
+    return keyboard
+
+
+
 def user_car_keyboard():
     keyboard = InlineKeyboardMarkup(row_width=3)
     keyboard.add(
@@ -32,7 +43,7 @@ def driver_keyboard():
     return ReplyKeyboardMarkup(
         keyboard=[
             [KeyboardButton("📍 Yurish joyi tanlash"), KeyboardButton("📋 Aktiv buyurtmalar")],
-            [KeyboardButton("⚙️ Sozlamalar"), KeyboardButton("📋 Barcha Buyurtmalar")],
+            [KeyboardButton("👤 Rolni o'zgartirish"), KeyboardButton("📋 Barcha Buyurtmalar")],
         ],
         resize_keyboard=True,
         one_time_keyboard=True,
@@ -42,7 +53,7 @@ def passenger_keyboard():
     return ReplyKeyboardMarkup(
         keyboard=[
             [KeyboardButton("📋 Buyurtma berish"), KeyboardButton("📋 Barcha Buyurtmalar")],
-            [KeyboardButton("⚙️ Sozlamalar")],
+            [KeyboardButton("👤 Rolni o'zgartirish")],
         ],
         resize_keyboard=True,
         one_time_keyboard=True,
@@ -52,7 +63,7 @@ def shipper_keyboard():
     return ReplyKeyboardMarkup(
         keyboard=[
             [KeyboardButton("📦 Yuk yuborish"), KeyboardButton("📋 Barcha Buyurtmalar")],
-            [KeyboardButton("⚙️ Sozlamalar")],
+            [KeyboardButton("👤 Rolni o'zgartirish")],
         ],
         resize_keyboard=True,
         one_time_keyboard=True,
