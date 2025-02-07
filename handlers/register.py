@@ -5,7 +5,7 @@ from aiogram.dispatcher.filters.state import State, StatesGroup
 from aiogram.dispatcher import FSMContext
 from sqlalchemy.exc import IntegrityError
 from utils.keyboards import user_role_keyboard, user_car_keyboard, driver_keyboard, passenger_keyboard, shipper_keyboard
-
+from .group_order import get_user_info
 import re
 from aiogram import types
 from aiogram.dispatcher import FSMContext
@@ -23,6 +23,12 @@ class RegisterState(StatesGroup):
 
 # 1-BOSQICH: Foydalanuvchi rolini tanlash
 async def start_registration(message: types.Message):
+    user_id = message.from_user.id
+    get_user = get_user_info(user_id)
+    is_registered = get_user.get('is_registered')
+    if is_registered == True:
+        await message.answer("🟢 Siz ro'yxatdan o'tganiz! \nBotdan foydalanish uchun /start buyrug'ini yozing!")
+        return
     await message.answer("Siz kim sifatida ro'yxatdan o'tmoqchisiz?", reply_markup=user_role_keyboard())
     await RegisterState.role.set()
 
