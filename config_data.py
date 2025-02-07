@@ -1,4 +1,4 @@
-API_TOKEN = '8149148366:AAEB_M2q0iqbPiLCmXx9tcxCicMfvhfOvSU'
+API_TOKEN = '7022740421:AAH139uJNDAxKjfskqtv3Sl9jR4gumkQLGE'
 API_URL = 'http://127.0.0.1:8000/api/'
 GROUP_ID = -1002361938537  # Guruh ID sini o'zgartiring
 

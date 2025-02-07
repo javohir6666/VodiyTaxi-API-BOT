@@ -31,7 +31,7 @@ def user_car_keyboard():
 def driver_keyboard():
     return ReplyKeyboardMarkup(
         keyboard=[
-            [KeyboardButton("📍 Yurish joyi tanlash"), KeyboardButton("🔢 Bo'sh joylar soni")],
+            [KeyboardButton("📍 Yurish joyi tanlash"), KeyboardButton("📋 Aktiv buyurtmalar")],
             [KeyboardButton("⚙️ Sozlamalar"), KeyboardButton("📋 Barcha Buyurtmalar")],
         ],
         resize_keyboard=True,

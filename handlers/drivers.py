@@ -4,7 +4,7 @@ from aiogram.dispatcher import FSMContext
 from utils.keyboards import direction_keyboard, tashkent_region_keyboard, vodiy_region_keyboard
 import requests
 from config_data import API_URL, USERS_API_URL, UPDATE_ROLE_USER_API_URL
-
+from .group_order import get_user_info
 class DriverLocationState(StatesGroup):
     current_direction = State()
     current_region = State()
@@ -96,11 +96,35 @@ async def handle_dropoff_location(call: types.CallbackQuery, state: FSMContext):
         await call.message.edit_text(f"❌ Xatolik yuz berdi: {e}", reply_markup=None)
 
     finally:
+        # State'ni yakunlash
+        await state.finish()
         await call.answer()
+
+async def get_active_order(message: types.Message):
+    driver_id = message.from_user.id
+    get_driver = get_user_info(driver_id)
+    driver = get_driver.get('id')
+    # API'dan bajarilgan barcha orderlarni olish
+    response = requests.get(f"{API_URL}driver/{driver}/active_orders/")
+    response.raise_for_status()  # HTTP xatoliklarni tekshirish
+    orders = response.json()
+    if orders:
+        for order in orders:
+            await message.answer(f"✅ Buyurtma raqami:{order['id']}\n\n"
+                                 f"📑 Buyurtma turi: {order['order_type']}\n"
+                                 f"🚖 Yo\'nalish: {order['direction']}\n"
+                                 f"📍 Olish joyi: {order['pickup_location']}"
+                                 f"dan → {order['dropoff_location']}ga\n"
+                                 f"🕒 Ketish vaqti: {order['departure_time']}\n"
+                                 )
+    
+
 
 def register_handlers(dp: Dispatcher):
     dp.register_message_handler(start_location_driver, commands=['location_driver'])
     dp.register_message_handler(start_location_driver, text="📍 Yurish joyi tanlash", state="*")
+    dp.register_message_handler(get_active_order, commands=["active_orders"], state="*")
+    dp.register_message_handler(get_active_order, text="📋 Aktiv buyurtmalar", state="*")
     dp.register_callback_query_handler(handle_current_direction, state=DriverLocationState.current_direction)
     dp.register_callback_query_handler(handle_current_region, state=DriverLocationState.current_region)
     dp.register_callback_query_handler(handle_dropoff_location, state=DriverLocationState.dropoff_location)

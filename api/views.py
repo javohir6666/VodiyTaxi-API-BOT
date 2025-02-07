@@ -188,8 +188,19 @@ def get_user_orders(request, user_id):
     user = get_object_or_404(User, id=user_id)
     orders = Order.objects.filter(Q(passenger=user) | Q(shipper=user) | Q(driver=user))
     serializer = OrderSerializer(orders, many=True)
+    
     return Response(serializer.data, status=status.HTTP_200_OK)
+@api_view(["GET"])
+def get_driver_active_orders(request, user_id):
+    """ Haydovchining qabul qilgan aktiv buyurtmalarini olish """
+    user = get_object_or_404(User, id=user_id)
 
+    orders = Order.objects.filter(driver__isnull=False, driver=user, status="accepted")
+    if not orders.exists():
+        return Response({"message": "Sizda aktiv buyurtmalar yo‘q"}, status=status.HTTP_404_NOT_FOUND)
+
+    serializer = OrderSerializer(orders, many=True)
+    return Response(serializer.data, status=status.HTTP_200_OK)
 
 class OrderDetailAPIView(APIView):
     def get(self, request, order_id, format=None):
